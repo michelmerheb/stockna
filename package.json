@@ -8,13 +8,15 @@
     "dev": "turbo dev",
     "build": "turbo build",
     "lint": "turbo lint",
-    "test": "turbo test"
+    "test": "turbo test",
+    "preinstall": "npx only-allow@1.2.2 pnpm"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "packageManager": "pnpm@10.10.0",
   "devDependencies": {
+    "only-allow": "^1.2.2",
     "turbo": "^2.7.4",
     "typescript": "^5.9.3"
   }
