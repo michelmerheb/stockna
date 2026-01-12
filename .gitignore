@@ -1,0 +1,10 @@
+# compiled output
+/dist
+/node_modules
+/build
+
+.turbo/
+node_modules/
+dist/
+.next/
+.env
