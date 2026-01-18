@@ -1,0 +1,230 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum UserRole {
+  OWNER
+  ACCOUNTANT
+  EMPLOYEE
+}
+
+enum InvoiceStatus {
+  DRAFT
+  SENT
+  PARTIALLY_PAID
+  PAID
+  OVERDUE
+  VOID
+}
+
+enum PaymentMethod {
+  CASH
+  BANK_TRANSFER
+  CARD
+  CHEQUE
+  OTHER
+}
+
+model Company {
+  id               String   @id @default(cuid())
+  name             String
+  baseCurrencyCode String
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  memberships Membership[]
+  clients     Client[]
+  invoices    Invoice[]
+  payments    Payment[]
+  expenses    Expense[]
+  fxRates     FxRateSnapshot[]
+
+  @@index([baseCurrencyCode])
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  memberships Membership[]
+}
+
+model Membership {
+  id        String   @id @default(cuid())
+  companyId String
+  userId    String
+  role      UserRole
+  createdAt DateTime @default(now())
+
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([companyId, userId])
+  @@index([userId])
+  @@index([companyId, role])
+}
+
+model Client {
+  id        String   @id @default(cuid())
+  name      String
+  email     String?
+  phone     String?
+  companyId String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  company  Company   @relation(fields: [companyId], references: [id], onDelete: Restrict)
+  invoices Invoice[]
+  payments Payment[]
+
+  @@unique([companyId, email])
+  @@index([companyId, name])
+}
+
+model Invoice {
+  id            String        @id @default(cuid())
+  invoiceNumber String
+  companyId     String
+  clientId      String
+  invoiceStatus InvoiceStatus @default(DRAFT)
+  issuedAt      DateTime?
+  dueAt         DateTime?
+  currencyCode  String
+  fxRateToBase  Decimal?      @db.Decimal(20, 6)
+  subtotal      Decimal       @default(0) @db.Decimal(20, 6)
+  taxTotal      Decimal       @default(0) @db.Decimal(20, 6)
+  discountTotal Decimal       @default(0) @db.Decimal(20, 6)
+  total         Decimal       @default(0) @db.Decimal(20, 6)
+
+  baseSubtotal Decimal @default(0) @db.Decimal(20, 6)
+  baseTotal    Decimal @default(0) @db.Decimal(20, 6)
+
+  amountPaid Decimal @default(0) @db.Decimal(20, 6)
+  amountDue  Decimal @default(0) @db.Decimal(20, 6)
+
+  notes     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  company     Company             @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  client      Client              @relation(fields: [clientId], references: [id], onDelete: Restrict)
+  lines       InvoiceLine[]
+  allocations PaymentAllocation[]
+
+  @@unique([companyId, invoiceNumber])
+  @@index([companyId, invoiceStatus, dueAt])
+  @@index([companyId, clientId, issuedAt])
+}
+
+model InvoiceLine {
+  id        String @id @default(cuid())
+  invoiceId String
+  position  Int
+
+  description String
+  quantity    Decimal @default(1) @db.Decimal(20, 6)
+  unitPrice   Decimal @db.Decimal(20, 6)
+  discount    Decimal @default(0) @db.Decimal(20, 6)
+  tax         Decimal @default(0) @db.Decimal(20, 6)
+  lineTotal   Decimal @db.Decimal(20, 6)
+
+  invoice Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+
+  @@unique([invoiceId, position])
+  @@index([invoiceId])
+}
+
+model Payment {
+  id            String        @id @default(cuid())
+  companyId     String
+  clientId      String
+  paymentMethod PaymentMethod
+  paidAt        DateTime      @default(now())
+  currencyCode  String
+  fxRateToBase  Decimal?      @db.Decimal(20, 6)
+  amount        Decimal       @db.Decimal(20, 6)
+  baseAmount    Decimal       @default(0) @db.Decimal(20, 6)
+
+  reference String?
+  note      String?
+  createdAt DateTime @default(now())
+
+  company     Company             @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  client      Client              @relation(fields: [clientId], references: [id], onDelete: Restrict)
+  allocations PaymentAllocation[]
+
+  @@index([companyId, paidAt])
+  @@index([companyId, clientId, paidAt])
+}
+
+model PaymentAllocation {
+  id        String   @id @default(cuid())
+  paymentId String
+  invoiceId String
+  amount    Decimal  @db.Decimal(20, 6)
+  createdAt DateTime @default(now())
+
+  payment Payment @relation(fields: [paymentId], references: [id], onDelete: Cascade)
+  invoice Invoice @relation(fields: [invoiceId], references: [id], onDelete: Restrict)
+
+  @@unique([paymentId, invoiceId])
+  @@index([invoiceId, paymentId])
+}
+
+model ExpenseCategory {
+  id        String    @id @default(cuid())
+  companyId String
+  name      String
+  createdAt DateTime  @default(now())
+  expenses  Expense[]
+
+  @@unique([companyId, name])
+  @@index([companyId])
+  @@index([companyId, name])
+}
+
+model Expense {
+  id         String   @id @default(cuid())
+  companyId  String
+  categoryId String?
+  spentAt    DateTime @default(now())
+
+  currencyCode String
+  fxRateToBase Decimal? @db.Decimal(20, 6)
+  amount       Decimal  @db.Decimal(20, 6)
+  baseAmount   Decimal  @default(0) @db.Decimal(20, 6)
+
+  vendor    String?
+  note      String?
+  createdAt DateTime @default(now())
+
+  company  Company          @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  category ExpenseCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+
+  @@index([companyId, spentAt])
+  @@index([companyId, categoryId, spentAt])
+}
+
+model FxRateSnapshot {
+  id            String   @id @default(cuid())
+  companyId     String
+  baseCurrency  String
+  quoteCurrency String
+  rate          Decimal  @db.Decimal(20, 6)
+  capturedAt    DateTime @default(now())
+  source        String?
+  note          String?
+
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId, capturedAt])
+  @@index([companyId, baseCurrency, quoteCurrency, capturedAt])
+}
