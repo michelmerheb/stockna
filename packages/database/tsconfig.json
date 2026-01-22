@@ -1,9 +1,16 @@
 {
   "compilerOptions": {
-    "module": "ESNext",
-    "moduleResolution": "node",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "rootDir": ".",
+    "outDir": "./dist",
+    "declaration": true,
+    "emitDeclarationOnly": false,
+    "declarationDir": "./dist",
     "target": "ES2023",
     "strict": true,
-    "esModuleInterop": true
-  }
+    "esModuleInterop": true,
+    "types": ["node"]
+  },
+  "include": ["src/**/*.ts", "generated/**/*.ts", "prisma.config.ts"]
 }
