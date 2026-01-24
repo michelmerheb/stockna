@@ -6,6 +6,7 @@ import {
   Req,
   UseGuards,
   UnauthorizedException,
+  HttpCode,
 } from '@nestjs/common';
 import { Request } from 'express';
 import { AuthService } from './auth.service';
@@ -41,6 +42,7 @@ export class AuthController {
     return this.authService.register(dto);
   }
 
+  @HttpCode(200)
   @Post('login')
   login(@Body() dto: LoginDto) {
     return this.authService.login(dto.email, dto.password);

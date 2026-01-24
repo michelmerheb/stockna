@@ -17,7 +17,7 @@ export class AuthService {
   ) {}
 
   private normalizeEmail(email: string) {
-    return email.trim().toLocaleLowerCase();
+    return email.trim().toLowerCase();
   }
 
   async register(data: { email: string; password: string; name?: string }) {

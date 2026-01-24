@@ -6,6 +6,7 @@ import { AuthController } from './auth.controller';
 import { UsersModule } from 'src/modules/users/users.module';
 import { PasswordService } from 'src/common/crypto/password.service';
 import { JwtAccessStrategy } from './strategies/jwt-access-strategy';
+import { JwtAccessGuard } from './guards/jwt-access.guard';
 
 @Module({
   imports: [
@@ -22,6 +23,6 @@ import { JwtAccessStrategy } from './strategies/jwt-access-strategy';
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, PasswordService, JwtAccessStrategy],
+  providers: [AuthService, PasswordService, JwtAccessStrategy, JwtAccessGuard],
 })
 export class AuthModule {}
