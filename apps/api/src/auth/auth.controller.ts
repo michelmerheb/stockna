@@ -28,6 +28,7 @@ export class AuthController {
   @Get('me')
   async me(@Req() req: AuthRequest) {
     const userId = req.user!.userId;
+    console.log(req.user);
     const user = await this.usersService.findPublicById(userId);
     if (!user) {
       throw new UnauthorizedException();

@@ -18,6 +18,7 @@ import { HealthModule } from './health/health.module';
     CompaniesModule,
     UsersModule,
     HealthModule,
+    CompaniesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
