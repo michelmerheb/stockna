@@ -48,12 +48,12 @@ model Company {
 }
 
 model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  name      String?
-  passwordHash String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id                String    @id @default(cuid())
+  email             String    @unique
+  name              String?
+  passwordHash      String
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
   passwordUpdatedAt DateTime? @default(now())
 
   memberships Membership[]
@@ -79,6 +79,7 @@ model Client {
   name      String
   email     String?
   phone     String?
+  address   String?
   companyId String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

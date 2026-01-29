@@ -4,6 +4,7 @@ import type { UserRole } from '@stockna/database/dist/generated/prisma/enums';
 export type AuthUser = {
   userId?: string;
   email?: string;
+  companyId?: string;
 };
 
 export type CompanyMembershipContext = {
