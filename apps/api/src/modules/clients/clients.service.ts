@@ -21,6 +21,7 @@ export class ClientsService {
           name: dto.name.trim(),
           email: dto.email?.trim() ?? null,
           phone: dto.phone?.trim() ?? null,
+          //address: dto.address?.trim() ?? null
         },
       });
     } catch (err) {
