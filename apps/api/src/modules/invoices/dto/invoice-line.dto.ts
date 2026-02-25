@@ -11,7 +11,7 @@ export class InvoiceLineDto {
 
   @IsString()
   @IsNotEmpty()
-  unitePrice!: string;
+  unitPrice!: string;
 
   @IsOptional()
   @IsString()

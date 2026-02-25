@@ -21,30 +21,24 @@ import { ListInvoicesQueryDto } from './dto/list-invoices.query.dto';
 // ✅ Use your existing guards (paths may differ in your project)
 import { JwtAccessGuard } from 'src/auth/guards/jwt-access.guard';
 import { CompanyContextGuard } from 'src/auth/guards/company-context.guard';
-import { CompanyMemberGuard } from 'src/auth/guards/company-member.guard';
-
+import type { AuthRequest } from 'src/auth/types/auth-request.type';
 // If you already have an AuthRequest type, import it and delete the interface below.
 // import type { AuthRequest } from '../companies/types/auth-request.type';
 
-interface AuthRequest extends Request {
-  user?: { userId: string };
-  company?: { companyId: string; role: string };
-}
-
 @Controller('invoices')
-@UseGuards(JwtAccessGuard, CompanyContextGuard, CompanyMemberGuard)
+@UseGuards(JwtAccessGuard, CompanyContextGuard)
 export class InvoicesController {
   constructor(private readonly invoicesService: InvoicesService) {}
 
   @Post()
   async createDraft(@Req() req: AuthRequest, @Body() dto: CreateInvoiceDto) {
-    const companyId = req.company?.companyId;
+    const companyId = req.membership?.companyId;
     return this.invoicesService.createDraft(companyId as string, dto);
   }
 
   @Get()
   async list(@Req() req: AuthRequest, @Query() query: ListInvoicesQueryDto) {
-    const companyId = req.company?.companyId;
+    const companyId = req.membership?.companyId;
 
     return this.invoicesService.list(companyId as string, {
       status: query.status,
@@ -57,7 +51,7 @@ export class InvoicesController {
     @Req() req: AuthRequest,
     @Param('invoiceId') invoiceId: string,
   ) {
-    const companyId = req.company?.companyId;
+    const companyId = req.membership?.companyId;
     return this.invoicesService.getById(companyId as string, invoiceId);
   }
 
@@ -68,7 +62,7 @@ export class InvoicesController {
     @Param('invoiceId') invoiceId: string,
     @Body() dto: UpdateInvoiceDto,
   ) {
-    const companyId = req.company?.companyId;
+    const companyId = req.membership?.companyId;
     return this.invoicesService.updateDraft(
       companyId as string,
       invoiceId,
@@ -79,7 +73,7 @@ export class InvoicesController {
   // DRAFT -> SENT
   @Post(':invoiceId/send')
   async send(@Req() req: AuthRequest, @Param('invoiceId') invoiceId: string) {
-    const companyId = req.company?.companyId;
+    const companyId = req.membership?.companyId;
     return this.invoicesService.send(companyId as string, invoiceId);
   }
 
@@ -89,7 +83,7 @@ export class InvoicesController {
     @Req() req: AuthRequest,
     @Param('invoiceId') invoiceId: string,
   ) {
-    const companyId = req.company?.companyId;
+    const companyId = req.membership?.companyId;
     return this.invoicesService.void(companyId as string, invoiceId);
   }
 
@@ -102,7 +96,7 @@ export class InvoicesController {
     @Req() req: AuthRequest,
     @Param('invoiceId') invoiceId: string,
   ) {
-    const companyId = req.company?.companyId;
+    const companyId = req.membership?.companyId;
     return this.invoicesService.recomputePaidAmounts(
       companyId as string,
       invoiceId,

@@ -9,6 +9,7 @@ import { CompaniesModule } from './modules/companies/companies.module';
 import { ConfigModule } from '@nestjs/config';
 import { HealthModule } from './health/health.module';
 import { ClientsModule } from './modules/clients/clients.module';
+import { InvoicesModule } from './modules/invoices/invoices.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { ClientsModule } from './modules/clients/clients.module';
     HealthModule,
     CompaniesModule,
     ClientsModule,
+    InvoicesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

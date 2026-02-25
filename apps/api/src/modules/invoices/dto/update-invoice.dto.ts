@@ -1,7 +1,7 @@
 import { Type } from 'class-transformer';
 import {
   ArrayMinSize,
-  IsDateString,
+  IsDate,
   IsOptional,
   IsString,
   ValidateNested,
@@ -15,20 +15,22 @@ export class UpdateInvoiceDto {
 
   @IsOptional()
   @IsString()
-  baseCurrencyCode?: string;
+  currencyCode?: string;
 
   @IsOptional()
   @IsString()
   fxRateToBase?: string;
 
-  // Allow null to clear dates if you want (service handles undefined vs null)
+  // Allow null to clear dates (service handles undefined vs null)
   @IsOptional()
-  @IsDateString()
-  issueAt?: string | null;
+  @IsDate()
+  @Type(() => Date)
+  issuedAt?: Date | null;
 
   @IsOptional()
-  @IsDateString()
-  dueAt?: string | null;
+  @IsDate()
+  @Type(() => Date)
+  dueAt?: Date | null;
 
   @IsOptional()
   @IsString()

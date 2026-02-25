@@ -1,6 +1,6 @@
 import {
   ArrayMinSize,
-  IsDateString,
+  IsDate,
   IsNotEmpty,
   IsOptional,
   IsString,
@@ -8,7 +8,6 @@ import {
   MaxLength,
   ValidateNested,
 } from 'class-validator';
-import { UpdateInvoiceDto } from './update-invoice.dto';
 import { Type } from 'class-transformer';
 import { InvoiceLineDto } from './invoice-line.dto';
 
@@ -19,21 +18,23 @@ export class CreateInvoiceDto {
   clientId!: string;
 
   @IsString()
-  @IsOptional()
+  @IsNotEmpty()
   @Length(3, 3)
-  baseCurrencyCode!: string;
+  currencyCode!: string;
 
   @IsOptional()
   @IsString()
   fxRateToBase?: string;
 
   @IsOptional()
-  @IsDateString()
-  issueDate?: string;
+  @IsDate()
+  @Type(() => Date)
+  issuedAt?: Date;
 
   @IsOptional()
-  @IsDateString()
-  dueDate?: string;
+  @IsDate()
+  @Type(() => Date)
+  dueAt?: Date;
 
   @IsOptional()
   @IsString()
